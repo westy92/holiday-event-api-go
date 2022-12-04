@@ -9,9 +9,7 @@ type StandardResponse struct {
 
 type RateLimit struct {
 	LimitMonth     int
-	LimitDay       int
 	RemainingMonth int
-	RemainingDay   int
 }
 
 type GetEventsRequest struct {

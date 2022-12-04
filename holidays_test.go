@@ -7,6 +7,22 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
+func TestNew(t *testing.T) {
+	t.Run("fails with missing API Key", func(t *testing.T) {
+		api, err := New("")
+
+		assert.Nil(t, api)
+		assert.EqualError(t, err, "please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
+	})
+
+	t.Run("returns a new client", func(t *testing.T) {
+		api, err := New("abc123")
+
+		assert.Nil(t, err)
+		assert.NotNil(t, api)
+	})
+}
+
 func TestCommonFunctionality(t *testing.T) {
 	t.Run("passes along API key", func(t *testing.T) {
 		defer gock.Off()
@@ -17,7 +33,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		api.GetEvents(GetEventsRequest{})
 
 		assert.True(t, gock.IsDone())
@@ -32,7 +48,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		api.GetEvents(GetEventsRequest{})
 
 		assert.True(t, gock.IsDone())
@@ -46,7 +62,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(401).
 			JSON(map[string]string{"error": "MyError!"})
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert.Nil(t, response)
@@ -62,7 +78,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Get("/events").
 			Reply(500)
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert.Nil(t, response)
@@ -83,15 +99,13 @@ func TestCommonFunctionality(t *testing.T) {
 			SetHeader("x-ratelimit-remaining-day", "9").
 			File("testdata/getEvents-default.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert.Nil(t, err)
 		assert.Equal(t, response.RateLimit, RateLimit{
 			LimitMonth:     100,
-			LimitDay:       10,
 			RemainingMonth: 88,
-			RemainingDay:   9,
 		})
 
 		assert.True(t, gock.IsDone())
@@ -107,7 +121,7 @@ func TestGetEvents(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert.Nil(t, err)
@@ -136,7 +150,7 @@ func TestGetEvents(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-parameters.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEvents(GetEventsRequest{
 			Adult:    true,
 			Timezone: "America/New_York",
@@ -169,7 +183,7 @@ func TestGetEventInfo(t *testing.T) {
 			Reply(200).
 			File("testdata/getEventInfo.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{
 			Id: "f90b893ea04939d7456f30c54f68d7b4",
 		})
@@ -192,7 +206,7 @@ func TestGetEventInfo(t *testing.T) {
 			Reply(200).
 			File("testdata/getEventInfo-parameters.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{
 			Id:    "f90b893ea04939d7456f30c54f68d7b4",
 			Start: 2002,
@@ -218,7 +232,7 @@ func TestGetEventInfo(t *testing.T) {
 			Reply(404).
 			JSON(map[string]string{"error": "Event not found."})
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{
 			Id: "hi",
 		})
@@ -230,11 +244,11 @@ func TestGetEventInfo(t *testing.T) {
 	})
 
 	t.Run("missing id", func(t *testing.T) {
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{})
 
 		assert.Nil(t, response)
-		assert.EqualError(t, err, "Event id is required.")
+		assert.EqualError(t, err, "event id is required")
 	})
 }
 
@@ -248,7 +262,7 @@ func TestSearch(t *testing.T) {
 			Reply(200).
 			File("testdata/search-default.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "zucchini",
 		})
@@ -276,7 +290,7 @@ func TestSearch(t *testing.T) {
 			Reply(200).
 			File("testdata/search-parameters.json")
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "porch day",
 			Adult: true,
@@ -304,7 +318,7 @@ func TestSearch(t *testing.T) {
 			Reply(400).
 			JSON(map[string]string{"error": "Please enter a longer search term."})
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "a",
 		})
@@ -324,7 +338,7 @@ func TestSearch(t *testing.T) {
 			Reply(400).
 			JSON(map[string]string{"error": "Too many results returned. Please refine your query."})
 
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "day",
 		})
@@ -336,10 +350,10 @@ func TestSearch(t *testing.T) {
 	})
 
 	t.Run("missing parameters", func(t *testing.T) {
-		api := New("abc123")
+		api, _ := New("abc123")
 		response, err := api.Search(SearchRequest{})
 
 		assert.Nil(t, response)
-		assert.EqualError(t, err, "Search query is required.")
+		assert.EqualError(t, err, "search query is required")
 	})
 }

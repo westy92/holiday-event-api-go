@@ -1,4 +1,4 @@
-module github.com/westy92/holiday-api-go
+module github.com/westy92/holiday-event-api-go
 
 go 1.19
 

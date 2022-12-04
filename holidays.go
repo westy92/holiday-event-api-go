@@ -16,16 +16,14 @@ const version = "0.0.1"
 const userAgent = "HolidayApiGo/" + version
 const baseUrl = "https://api.apilayer.com/checkiday/"
 
-func New(apiKey string) *Client {
-	/*
-	   TODO
-	   if (!config?.apiKey || config.apiKey.length == 0) {
-	     throw new Error('Please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing.');
-	   }
-	*/
+func New(apiKey string) (*Client, error) {
+	if apiKey == "" {
+		return nil, errors.New("please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
+	}
+
 	return &Client{
 		apiKey: apiKey,
-	}
+	}, nil
 }
 
 func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
@@ -55,7 +53,7 @@ func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, e
 	var params = url.Values{}
 
 	if req.Id == "" {
-		return nil, errors.New("Event id is required.")
+		return nil, errors.New("event id is required")
 	}
 	params["id"] = []string{req.Id}
 
@@ -83,7 +81,7 @@ func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 	}
 
 	if req.Query == "" {
-		return nil, errors.New("Search query is required.")
+		return nil, errors.New("search query is required")
 	}
 	params["query"] = []string{req.Query}
 
@@ -136,14 +134,10 @@ func request[R StandardResponseInterface](client *Client, path string, params ur
 	}
 
 	limitMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-limit-month"))
-	limitDay, _ := strconv.Atoi(res.Header.Get("x-ratelimit-limit-day"))
 	remainingMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-remaining-month"))
-	remainingDay, _ := strconv.Atoi(res.Header.Get("x-ratelimit-remaining-day"))
 	rateLimit := RateLimit{
 		LimitMonth:     limitMonth,
-		LimitDay:       limitDay,
 		RemainingMonth: remainingMonth,
-		RemainingDay:   remainingDay,
 	}
 
 	return &result, &rateLimit, nil
