@@ -8,8 +8,10 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        go-version: [1.19]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # last 2 major versions are supported
+        # https://go.dev/doc/devel/release#policy
+        go-version: [1.18, 1.19]
 
     steps:
     - uses: actions/checkout@v3
