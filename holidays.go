@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 )
 
@@ -95,12 +96,12 @@ func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 	return res, nil
 }
 
-func request[R StandardResponseInterface](client *Client, path string, params url.Values) (*R, *RateLimit, error) {
+func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
 	url, err := url.Parse(baseUrl)
 	if err != nil {
 		return nil, nil, err
 	}
-	url = url.JoinPath(path)
+	url.Path = path.Join(url.Path, urlPath)
 
 	if params != nil {
 		url.RawQuery = params.Encode()
