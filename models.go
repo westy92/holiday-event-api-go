@@ -13,18 +13,9 @@ type RateLimit struct {
 }
 
 type GetEventsRequest struct {
-	/**
-	 * Date to get the events for. Defaults to today.
-	 */
-	Date string
-	/**
-	* Include events that may be unsafe for viewing at work or by children. Default is false.
-	 */
-	Adult bool
-	/**
-	* IANA Time Zone for calculating dates and times. Defaults to America/Chicago.
-	 */
-	Timezone string
+	Date     string // Date to get the events for. Defaults to today.
+	Adult    bool   // Include events that may be unsafe for viewing at work or by children. Default is false.
+	Timezone string // IANA Time Zone for calculating dates and times. Defaults to America/Chicago.
 }
 
 type GetEventsResponse struct {
@@ -44,14 +35,8 @@ type EventSummary struct {
 }
 
 type SearchRequest struct {
-	/**
-	 * The search query. Must be at least 3 characters long.
-	 */
-	Query string
-	/**
-	 * Include events that may be unsafe for viewing at work or by children. Default is false.
-	 */
-	Adult bool
+	Query string // The search query. Must be at least 3 characters long.
+	Adult bool   // Include events that may be unsafe for viewing at work or by children. Default is false.
 }
 
 type SearchResponse struct {
@@ -62,18 +47,9 @@ type SearchResponse struct {
 }
 
 type GetEventInfoRequest struct {
-	/**
-	 * The ID of the requested Event.
-	 */
-	Id string `json:"id"`
-	/**
-	 * The starting range of returned occurrences. Optional, defaults to 2 years prior.
-	 */
-	Start int `json:"start"`
-	/**
-	 * The ending range of returned occurrences. Optional, defaults to 3 years in the future.
-	 */
-	End int `json:"end"`
+	Id    string `json:"id"`    // The ID of the requested Event.
+	Start int    `json:"start"` // The starting range of returned occurrences. Optional, defaults to 2 years prior.
+	End   int    `json:"end"`   // The ending range of returned occurrences. Optional, defaults to 3 years in the future.
 }
 
 type GetEventInfoResponse struct {

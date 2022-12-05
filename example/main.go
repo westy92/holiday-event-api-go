@@ -32,5 +32,4 @@ func main() {
 	randomEvent := events.Events[rand.Intn(len(events.Events))]
 	fmt.Printf("Today is %s! Find more information at: %s.\n", randomEvent.Name, randomEvent.Url)
 	fmt.Printf("Rate limit remaining: %d/%d (month).\n", events.RateLimit.RemainingMonth, events.RateLimit.LimitMonth)
-
 }
