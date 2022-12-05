@@ -3,6 +3,7 @@ package holidays
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -99,7 +100,7 @@ func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
 	url, err := url.Parse(baseUrl)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("can't parse baseUrl: %w", err)
 	}
 	url.Path = path.Join(url.Path, urlPath)
 
@@ -109,7 +110,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 
 	req, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("can't create request: %w", err)
 	}
 
 	req.Header.Set("apikey", client.apiKey)
@@ -117,7 +118,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("can't process request: %w", err)
 	}
 
 	defer res.Body.Close()
@@ -131,7 +132,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 
 	var result R
 	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("can't parse response: %w", err)
 	}
 
 	limitMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-limit-month"))

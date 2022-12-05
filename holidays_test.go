@@ -1,6 +1,7 @@
 package holidays
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -71,7 +72,7 @@ func TestCommonFunctionality(t *testing.T) {
 		assert.True(t, gock.IsDone())
 	})
 
-	t.Run("server error", func(t *testing.T) {
+	t.Run("server error (500)", func(t *testing.T) {
 		defer gock.Off()
 
 		gock.New("https://api.apilayer.com/checkiday/").
@@ -83,6 +84,39 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert.Nil(t, response)
 		assert.EqualError(t, err, "500 Internal Server Error")
+
+		assert.True(t, gock.IsDone())
+	})
+
+	t.Run("server error (other)", func(t *testing.T) {
+		defer gock.Off()
+
+		gock.New("https://api.apilayer.com/checkiday/").
+			Get("/events").
+			ReplyError(errors.New("err"))
+
+		api, _ := New("abc123")
+		response, err := api.GetEvents(GetEventsRequest{})
+
+		assert.Nil(t, response)
+		assert.EqualError(t, err, "can't process request: Get \"https://api.apilayer.com/checkiday/events?adult=false\": err")
+
+		assert.True(t, gock.IsDone())
+	})
+
+	t.Run("server error (malformed response)", func(t *testing.T) {
+		defer gock.Off()
+
+		gock.New("https://api.apilayer.com/checkiday/").
+			Get("/events").
+			Reply(200).
+			JSON("{")
+
+		api, _ := New("abc123")
+		response, err := api.GetEvents(GetEventsRequest{})
+
+		assert.Nil(t, response)
+		assert.EqualError(t, err, "can't parse response: unexpected EOF")
 
 		assert.True(t, gock.IsDone())
 	})
