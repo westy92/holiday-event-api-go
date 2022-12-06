@@ -52,7 +52,7 @@ func main() {
 	search, err := client.Search(holidays.SearchRequest{
 		Query: query,
 		// These parameters are the defaults but can be specified:
-		// Adult: false
+		// Adult: false,
 	})
 
 	if err != nil {

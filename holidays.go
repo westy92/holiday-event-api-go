@@ -105,6 +105,11 @@ func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 	return res, nil
 }
 
+// Gets the API Client Version
+func (c *Client) GetVersion() string {
+	return version
+}
+
 func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
 	url, err := url.Parse(baseUrl)
 	if err != nil {

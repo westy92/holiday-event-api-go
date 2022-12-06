@@ -2,6 +2,7 @@ package holidays
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,13 +44,14 @@ func TestCommonFunctionality(t *testing.T) {
 	t.Run("passes along user-agent", func(t *testing.T) {
 		defer gock.Off()
 
+		api, _ := New("abc123")
+
 		gock.New("https://api.apilayer.com/checkiday/").
 			Get("/events").
-			MatchHeader("user-agent", "HolidayApiGo/0.0.2"). // TODO grab version from somewhere?
+			MatchHeader("user-agent", fmt.Sprintf("HolidayApiGo/%s", api.GetVersion())).
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api, _ := New("abc123")
 		api.GetEvents(GetEventsRequest{})
 
 		assert.True(t, gock.IsDone())
