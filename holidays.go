@@ -10,14 +10,19 @@ import (
 	"strconv"
 )
 
+// The API Client
 type Client struct {
 	apiKey string
 }
 
-const version = "0.0.1"
-const userAgent = "HolidayApiGo/" + version
-const baseUrl = "https://api.apilayer.com/checkiday/"
+const (
+	version   = "0.0.1"
+	userAgent = "HolidayApiGo/" + version
+	baseUrl   = "https://api.apilayer.com/checkiday/"
+)
 
+// Creates a New Client using the provided API key.
+// Get one from https://apilayer.com/marketplace/checkiday-api#pricing
 func New(apiKey string) (*Client, error) {
 	if apiKey == "" {
 		return nil, errors.New("please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
@@ -28,6 +33,7 @@ func New(apiKey string) (*Client, error) {
 	}, nil
 }
 
+// Gets the Events for the provided Date
 func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
 	var params = url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
@@ -51,6 +57,7 @@ func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
 	return res, nil
 }
 
+// Gets the Event Info for the provided Event
 func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, error) {
 	var params = url.Values{}
 
@@ -77,6 +84,7 @@ func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, e
 	return res, nil
 }
 
+// Searches for Events with the given criteria
 func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 	var params = url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
