@@ -121,6 +121,28 @@ func TestCommonFunctionality(t *testing.T) {
 		assert.True(t, gock.IsDone())
 	})
 
+	t.Run("follows redirects", func(t *testing.T) {
+		defer gock.Off()
+
+		gock.New("https://api.apilayer.com/checkiday/").
+			Get("/events").
+			Reply(302).
+			SetHeader("Location", "https://api.apilayer.com/checkiday/redirected")
+
+		gock.New("https://api.apilayer.com/checkiday/").
+			Get("/redirected").
+			Reply(200).
+			File("testdata/getEvents-default.json")
+
+		api, _ := New("abc123")
+		response, err := api.GetEvents(GetEventsRequest{})
+
+		assert.Nil(t, err)
+		assert.Equal(t, response.Timezone, "America/Chicago")
+
+		assert.True(t, gock.IsDone())
+	})
+
 	t.Run("reports rate limits", func(t *testing.T) {
 		defer gock.Off()
 
