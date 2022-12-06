@@ -45,7 +45,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		gock.New("https://api.apilayer.com/checkiday/").
 			Get("/events").
-			MatchHeader("user-agent", "HolidayApiGo/0.0.1"). // TODO grab version from somewhere?
+			MatchHeader("user-agent", "HolidayApiGo/0.0.2"). // TODO grab version from somewhere?
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
