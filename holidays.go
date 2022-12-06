@@ -22,7 +22,7 @@ const (
 )
 
 // Creates a New Client using the provided API key.
-// Get one from https://apilayer.com/marketplace/checkiday-api#pricing
+// Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
 func New(apiKey string) (*Client, error) {
 	if apiKey == "" {
 		return nil, errors.New("please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
