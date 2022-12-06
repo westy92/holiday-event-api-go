@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	// Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
 	client, err := holidays.New("<your API key>")
 
 	if err != nil {
