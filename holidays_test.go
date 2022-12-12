@@ -90,6 +90,22 @@ func TestCommonFunctionality(t *testing.T) {
 		assert.True(t, gock.IsDone())
 	})
 
+	t.Run("server error (unknown)", func(t *testing.T) {
+		defer gock.Off()
+
+		gock.New("https://api.apilayer.com/checkiday/").
+			Get("/events").
+			Reply(599)
+
+		api, _ := New("abc123")
+		response, err := api.GetEvents(GetEventsRequest{})
+
+		assert.Nil(t, response)
+		assert.EqualError(t, err, "599 ")
+
+		assert.True(t, gock.IsDone())
+	})
+
 	t.Run("server error (other)", func(t *testing.T) {
 		defer gock.Off()
 
