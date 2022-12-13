@@ -9,7 +9,7 @@ type StandardResponse struct {
 	RateLimit RateLimit // The API plan's current rate limit and status
 }
 
-// A struct describing your API plan's current Rate Limit and status
+// Your API plan's current Rate Limit and status. Upgrade to increase these limits.
 type RateLimit struct {
 	LimitMonth     int // The amount of requests allowed this month
 	RemainingMonth int // The amount of requests remaining this month
@@ -86,7 +86,7 @@ type Occurrence struct {
 // Formatted Text
 type RichText struct {
 	Text     string `json:"text"`     // Formatted as plain text
-	Html     string `json:"html"`     // Rormatted as HTML
+	Html     string `json:"html"`     // Formatted as HTML
 	Markdown string `json:"markdown"` // Formatted as Markdown
 }
 
@@ -104,6 +104,13 @@ type ImageInfo struct {
 	Large  string `json:"large"`  // A large image
 }
 
+// Information about an Event Founder
+type FounderInfo struct {
+	Name string `json:"name"` // The Founder's name
+	Url  string `json:"url"`  // A link to the Founder
+	Date string `json:"date"` // The date the Event was founded
+}
+
 // Information about an Event
 type EventInfo struct {
 	EventSummary
@@ -116,6 +123,7 @@ type EventInfo struct {
 	HowToObserve   RichText        `json:"how_to_observe"`  // How to observe the Event
 	Patterns       []Pattern       `json:"patterns"`        // Patterns defining when the Event is observed
 	Occurrences    []Occurrence    `json:"occurrences"`     // The Event Occurrences (when it occurs)
+	Founders       []FounderInfo   `json:"founders"`        // The Event's founders
 }
 
 // An Error response object
