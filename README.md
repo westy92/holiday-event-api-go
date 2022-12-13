@@ -1,3 +1,5 @@
+# The Official Holiday and Event API for Go
+
 [![Go Reference](https://pkg.go.dev/badge/github.com/westy92/holiday-event-api-go.svg)](https://pkg.go.dev/github.com/westy92/holiday-event-api-go)
 [![Build Status](https://github.com/westy92/holiday-event-api-go/actions/workflows/github-actions.yml/badge.svg)](https://github.com/westy92/holiday-event-api-go/actions)
 [![Code Coverage](https://codecov.io/gh/westy92/holiday-event-api-go/branch/main/graph/badge.svg)](https://codecov.io/gh/westy92/holiday-event-api-go)
