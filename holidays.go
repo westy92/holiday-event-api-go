@@ -16,7 +16,7 @@ type Client struct {
 }
 
 const (
-	version   = "0.0.2"
+	version   = "1.0.0"
 	userAgent = "HolidayApiGo/" + version
 	baseUrl   = "https://api.apilayer.com/checkiday/"
 )
