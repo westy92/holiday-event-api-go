@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"runtime"
 	"strconv"
 )
 
@@ -128,6 +129,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 
 	req.Header.Set("apikey", client.apiKey)
 	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("X-Platform-Version", runtime.Version())
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
