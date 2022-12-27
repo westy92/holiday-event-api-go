@@ -5,7 +5,7 @@
 [![Code Coverage](https://codecov.io/gh/westy92/holiday-event-api-go/branch/main/graph/badge.svg)](https://codecov.io/gh/westy92/holiday-event-api-go)
 [![Funding Status](https://img.shields.io/github/sponsors/westy92)](https://github.com/sponsors/westy92)
 
-Industry-leading Holiday and Event API for JavaScript/TypeScript. Over 5,000 holidays and thousands of descriptions. Trusted by the World’s leading companies. Built by developers for developers since 2011.
+Industry-leading Holiday and Event API for Go. Over 5,000 holidays and thousands of descriptions. Trusted by the World’s leading companies. Built by developers for developers since 2011.
 
 ## Supported Go Versions
 Latest version of the the Holiday and Event API supports last two Go major [releases](https://go.dev/doc/devel/release#policy) and might work with older versions.
