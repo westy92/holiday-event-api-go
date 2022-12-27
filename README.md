@@ -17,7 +17,7 @@ Access to the Holiday and Event API requires an API Key. You can get for one for
 ## Installation
 
 ```console
-go get westy92/holiday-event-api-go/v1.0.0
+$ go get github.com/westy92/holiday-event-api-go
 ```
 
 ## Example
