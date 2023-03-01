@@ -7,6 +7,9 @@ require (
 	github.com/stretchr/testify v1.8.2
 )
 
+// exclude old, vulnerable, unused versions
+exclude github.com/stretchr/testify v1.7.1
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
