@@ -1,6 +1,6 @@
 module github.com/westy92/holiday-event-api-go
 
-go 1.18
+go 1.19
 
 require (
 	github.com/h2non/gock v1.2.0
