@@ -8,6 +8,7 @@
 Industry-leading Holiday and Event API for Go. Over 5,000 holidays and thousands of descriptions. Trusted by the World’s leading companies. Built by developers for developers since 2011.
 
 ## Supported Go Versions
+
 Latest version of the the Holiday and Event API supports last two Go major [releases](https://go.dev/doc/devel/release#policy) and might work with older versions.
 
 ## Authentication
@@ -17,7 +18,7 @@ Access to the Holiday and Event API requires an API Key. You can get for one for
 ## Installation
 
 ```console
-$ go get github.com/westy92/holiday-event-api-go
+go get github.com/westy92/holiday-event-api-go
 ```
 
 ## Example
