@@ -1,0 +1,26 @@
+linters:
+  enable-all: true
+  disable:
+    - execinquery # Deprecated
+    - gomnd # Deprecated
+    - exhaustruct
+    # TODO re-enable these
+    - depguard
+    - err113
+    - forbidigo
+    - funlen
+    - godox
+    - gofumpt
+    - lll
+    - nlreturn
+    - noctx
+    - paralleltest
+    - testifylint
+    - testpackage
+    - tparallel
+linters-settings:
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: snake

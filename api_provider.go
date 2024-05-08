@@ -8,44 +8,45 @@ import (
 
 // TODO docs
 
-type ApiProvider int
+type APIProvider int
 
 const (
-	ApiLayer ApiProvider = iota
-	RapidApi
+	APILayer APIProvider = iota
+	RapidAPI
+	// TODO APIMarket.
 )
 
-func (api ApiProvider) isValid() bool {
+func (api APIProvider) isValid() bool {
 	switch api {
-	case ApiLayer:
+	case APILayer:
 		return true
-	case RapidApi:
+	case RapidAPI:
 		return true
 	default:
 		return false
 	}
 }
 
-func (api ApiProvider) apiKeySource() string {
+func (api APIProvider) apiKeySource() string {
 	switch api {
-	case ApiLayer:
+	case APILayer:
 		return "https://apilayer.com/marketplace/checkiday-api#pricing"
-	case RapidApi:
+	case RapidAPI:
 		return "https://rapidapi.com/westy92-llc-westy92-llc-default/api/checkiday/pricing"
 	default:
 		return ""
 	}
 }
 
-func (api ApiProvider) baseUrl() url.URL {
+func (api APIProvider) baseURL() url.URL {
 	switch api {
-	case ApiLayer:
+	case APILayer:
 		return url.URL{
 			Scheme: "https",
 			Host:   "api.apilayer.com",
 			Path:   "checkiday",
 		}
-	case RapidApi:
+	case RapidAPI:
 		return url.URL{
 			Scheme: "https",
 			Host:   "checkiday.p.rapidapi.com",
@@ -55,30 +56,32 @@ func (api ApiProvider) baseUrl() url.URL {
 	}
 }
 
-func (api ApiProvider) extractRateLimitInfo(headers http.Header) RateLimit {
+func (api APIProvider) extractRateLimitInfo(headers http.Header) RateLimit {
 	var limit, remaining int
+
 	switch api {
-	case ApiLayer:
-		limit, _ = strconv.Atoi(headers.Get("x-ratelimit-limit-month"))
-		remaining, _ = strconv.Atoi(headers.Get("x-ratelimit-remaining-month"))
-	case RapidApi:
-		limit, _ = strconv.Atoi(headers.Get("x-ratelimit-requests-limit"))
-		remaining, _ = strconv.Atoi(headers.Get("x-ratelimit-requests-remaining"))
+	case APILayer:
+		limit, _ = strconv.Atoi(headers.Get("X-Ratelimit-Limit-Month"))
+		remaining, _ = strconv.Atoi(headers.Get("X-Ratelimit-Remaining-Month"))
+	case RapidAPI:
+		limit, _ = strconv.Atoi(headers.Get("X-Ratelimit-Requests-Limit"))
+		remaining, _ = strconv.Atoi(headers.Get("X-Ratelimit-Requests-Remaining"))
 	default:
 	}
+
 	return RateLimit{
 		Limit:     limit,
 		Remaining: remaining,
 	}
 }
 
-func (api ApiProvider) attachRequestHeaders(headers *http.Header, apiKey string) {
+func (api APIProvider) attachRequestHeaders(headers *http.Header, apiKey string) {
 	switch api {
-	case ApiLayer:
-		headers.Set("apikey", apiKey)
-	case RapidApi:
-		headers.Set("X-RapidAPI-Key", apiKey)
-		headers.Set("X-RapidAPI-Host", "checkiday.p.rapidapi.com")
+	case APILayer:
+		headers.Set("Apikey", apiKey)
+	case RapidAPI:
+		headers.Set("X-Rapidapi-Key", apiKey)
+		headers.Set("X-Rapidapi-Host", "checkiday.p.rapidapi.com")
 	default:
 	}
 }

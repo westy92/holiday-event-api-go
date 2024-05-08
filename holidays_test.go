@@ -2,7 +2,6 @@ package holidays
 
 import (
 	"errors"
-	"fmt"
 	"runtime"
 	"testing"
 
@@ -11,8 +10,11 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	t.Parallel()
 	t.Run("fails with missing API Key", func(t *testing.T) {
-		api, err := New(ApiLayer, "")
+		t.Parallel()
+
+		api, err := New(APILayer, "")
 
 		assert := assert.New(t)
 		assert.Nil(api)
@@ -20,10 +22,12 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("returns a new client", func(t *testing.T) {
-		api, err := New(ApiLayer, "abc123")
+		t.Parallel()
+
+		api, err := New(APILayer, "abc123")
 
 		assert := assert.New(t)
-		assert.Nil(err)
+		assert.NoError(err)
 		assert.NotNil(api)
 	})
 }
@@ -37,7 +41,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		_, _ = api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
@@ -45,12 +49,12 @@ func TestCommonFunctionality(t *testing.T) {
 	})
 
 	t.Run("passes along user-agent", func(t *testing.T) {
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 
 		defer gock.Off()
 		gock.New("https://api.apilayer.com/checkiday/").
 			Get("/events").
-			MatchHeader("user-agent", fmt.Sprintf("HolidayApiGo/%s", api.GetVersion())).
+			MatchHeader("user-agent", "HolidayApiGo/"+api.GetVersion()).
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
@@ -61,7 +65,7 @@ func TestCommonFunctionality(t *testing.T) {
 	})
 
 	t.Run("passes along platform version", func(t *testing.T) {
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 
 		defer gock.Off()
 		gock.New("https://api.apilayer.com/checkiday/").
@@ -83,7 +87,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(401).
 			JSON(map[string]string{"error": "MyError!"})
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
@@ -99,7 +103,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Get("/events").
 			Reply(500)
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
@@ -115,7 +119,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Get("/events").
 			Reply(599)
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
@@ -131,7 +135,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Get("/events").
 			ReplyError(errors.New("err"))
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
@@ -148,7 +152,7 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(200).
 			JSON("{")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
@@ -170,12 +174,12 @@ func TestCommonFunctionality(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
-		assert.Nil(err)
-		assert.Equal(response.Timezone, "America/Chicago")
+		assert.NoError(err)
+		assert.Equal("America/Chicago", response.Timezone)
 
 		assert.True(gock.IsDone())
 	})
@@ -189,15 +193,15 @@ func TestCommonFunctionality(t *testing.T) {
 			SetHeader("x-ratelimit-remaining-month", "88").
 			File("testdata/getEvents-default.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
-		assert.Nil(err)
-		assert.Equal(response.RateLimit, RateLimit{
+		assert.NoError(err)
+		assert.Equal(RateLimit{
 			Limit:     100,
 			Remaining: 88,
-		})
+		}, response.RateLimit)
 
 		assert.True(gock.IsDone())
 	})
@@ -211,21 +215,21 @@ func TestGetEvents(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-default.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
 
 		assert := assert.New(t)
-		assert.Nil(err)
+		assert.NoError(err)
 		assert.False(response.Adult)
-		assert.Equal(response.Timezone, "America/Chicago")
+		assert.Equal("America/Chicago", response.Timezone)
 		assert.Len(response.Events, 2)
 		assert.Len(response.MultidayStarting, 1)
 		assert.Len(response.MultidayOngoing, 2)
-		assert.Equal(response.Events[0], EventSummary{
-			Id:   "b80630ae75c35f34c0526173dd999cfc",
+		assert.Equal(EventSummary{
+			ID:   "b80630ae75c35f34c0526173dd999cfc",
 			Name: "Cinco de Mayo",
-			Url:  "https://www.checkiday.com/b80630ae75c35f34c0526173dd999cfc/cinco-de-mayo",
-		})
+			URL:  "https://www.checkiday.com/b80630ae75c35f34c0526173dd999cfc/cinco-de-mayo",
+		}, response.Events[0])
 
 		assert.True(gock.IsDone())
 	})
@@ -240,7 +244,7 @@ func TestGetEvents(t *testing.T) {
 			Reply(200).
 			File("testdata/getEvents-parameters.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{
 			Adult:    true,
 			Timezone: "America/New_York",
@@ -248,17 +252,17 @@ func TestGetEvents(t *testing.T) {
 		})
 
 		assert := assert.New(t)
-		assert.Nil(err)
+		assert.NoError(err)
 		assert.True(response.Adult)
-		assert.Equal(response.Timezone, "America/New_York")
+		assert.Equal("America/New_York", response.Timezone)
 		assert.Len(response.Events, 2)
-		assert.Len(response.MultidayStarting, 0)
+		assert.Empty(response.MultidayStarting)
 		assert.Len(response.MultidayOngoing, 1)
-		assert.Equal(response.Events[0], EventSummary{
-			Id:   "6ebb6fd5e483de2fde33969a6c398472",
+		assert.Equal(EventSummary{
+			ID:   "6ebb6fd5e483de2fde33969a6c398472",
 			Name: "Get to Know Your Customers Day",
-			Url:  "https://www.checkiday.com/6ebb6fd5e483de2fde33969a6c398472/get-to-know-your-customers-day",
-		})
+			URL:  "https://www.checkiday.com/6ebb6fd5e483de2fde33969a6c398472/get-to-know-your-customers-day",
+		}, response.Events[0])
 
 		assert.True(gock.IsDone())
 	})
@@ -273,14 +277,14 @@ func TestGetEventInfo(t *testing.T) {
 			Reply(200).
 			File("testdata/getEventInfo.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{
-			Id: "f90b893ea04939d7456f30c54f68d7b4",
+			ID: "f90b893ea04939d7456f30c54f68d7b4",
 		})
 
 		assert := assert.New(t)
-		assert.Nil(err)
-		assert.Equal(response.Event.Id, "f90b893ea04939d7456f30c54f68d7b4")
+		assert.NoError(err)
+		assert.Equal("f90b893ea04939d7456f30c54f68d7b4", response.Event.ID)
 		assert.Len(response.Event.Hashtags, 2)
 
 		assert.True(gock.IsDone())
@@ -296,20 +300,20 @@ func TestGetEventInfo(t *testing.T) {
 			Reply(200).
 			File("testdata/getEventInfo-parameters.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{
-			Id:    "f90b893ea04939d7456f30c54f68d7b4",
+			ID:    "f90b893ea04939d7456f30c54f68d7b4",
 			Start: 2002,
 			End:   2003,
 		})
 
 		assert := assert.New(t)
-		assert.Nil(err)
+		assert.NoError(err)
 		assert.Len(response.Event.Occurrences, 2)
-		assert.Equal(response.Event.Occurrences[0], Occurrence{
+		assert.Equal(Occurrence{
 			Date:   "08/08/2002",
 			Length: 1,
-		})
+		}, response.Event.Occurrences[0])
 
 		assert.True(gock.IsDone())
 	})
@@ -322,9 +326,9 @@ func TestGetEventInfo(t *testing.T) {
 			Reply(404).
 			JSON(map[string]string{"error": "Event not found."})
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{
-			Id: "hi",
+			ID: "hi",
 		})
 
 		assert := assert.New(t)
@@ -335,7 +339,9 @@ func TestGetEventInfo(t *testing.T) {
 	})
 
 	t.Run("missing id", func(t *testing.T) {
-		api, _ := New(ApiLayer, "abc123")
+		t.Parallel()
+
+		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEventInfo(GetEventInfoRequest{})
 
 		assert := assert.New(t)
@@ -353,21 +359,21 @@ func TestSearch(t *testing.T) {
 			Reply(200).
 			File("testdata/search-default.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "zucchini",
 		})
 
 		assert := assert.New(t)
-		assert.Nil(err)
+		assert.NoError(err)
 		assert.False(response.Adult)
-		assert.Equal(response.Query, "zucchini")
+		assert.Equal("zucchini", response.Query)
 		assert.Len(response.Events, 3)
-		assert.Equal(response.Events[0], EventSummary{
-			Id:   "cc81cbd8730098456f85f69798cbc867",
+		assert.Equal(EventSummary{
+			ID:   "cc81cbd8730098456f85f69798cbc867",
 			Name: "National Zucchini Bread Day",
-			Url:  "https://www.checkiday.com/cc81cbd8730098456f85f69798cbc867/national-zucchini-bread-day",
-		})
+			URL:  "https://www.checkiday.com/cc81cbd8730098456f85f69798cbc867/national-zucchini-bread-day",
+		}, response.Events[0])
 
 		assert.True(gock.IsDone())
 	})
@@ -381,22 +387,22 @@ func TestSearch(t *testing.T) {
 			Reply(200).
 			File("testdata/search-parameters.json")
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "porch day",
 			Adult: true,
 		})
 
 		assert := assert.New(t)
-		assert.Nil(err)
+		assert.NoError(err)
 		assert.True(response.Adult)
-		assert.Equal(response.Query, "porch day")
+		assert.Equal("porch day", response.Query)
 		assert.Len(response.Events, 1)
-		assert.Equal(response.Events[0], EventSummary{
-			Id:   "61363236f06e4eb8e4e14e5925c2503d",
+		assert.Equal(EventSummary{
+			ID:   "61363236f06e4eb8e4e14e5925c2503d",
 			Name: "Sneak Some Zucchini Onto Your Neighbor's Porch Day",
-			Url:  "https://www.checkiday.com/61363236f06e4eb8e4e14e5925c2503d/sneak-some-zucchini-onto-your-neighbors-porch-day",
-		})
+			URL:  "https://www.checkiday.com/61363236f06e4eb8e4e14e5925c2503d/sneak-some-zucchini-onto-your-neighbors-porch-day",
+		}, response.Events[0])
 
 		assert.True(gock.IsDone())
 	})
@@ -409,7 +415,7 @@ func TestSearch(t *testing.T) {
 			Reply(400).
 			JSON(map[string]string{"error": "Please enter a longer search term."})
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "a",
 		})
@@ -429,7 +435,7 @@ func TestSearch(t *testing.T) {
 			Reply(400).
 			JSON(map[string]string{"error": "Too many results returned. Please refine your query."})
 
-		api, _ := New(ApiLayer, "abc123")
+		api, _ := New(APILayer, "abc123")
 		response, err := api.Search(SearchRequest{
 			Query: "day",
 		})
@@ -442,7 +448,9 @@ func TestSearch(t *testing.T) {
 	})
 
 	t.Run("missing parameters", func(t *testing.T) {
-		api, _ := New(ApiLayer, "abc123")
+		t.Parallel()
+
+		api, _ := New(APILayer, "abc123")
 		response, err := api.Search(SearchRequest{})
 
 		assert := assert.New(t)
