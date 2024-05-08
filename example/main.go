@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
-	client, err := holidays.New("<your API key>")
+	client, err := holidays.New(holidays.ApiLayer, "<your API key>")
 
 	if err != nil {
 		fmt.Println(err)
@@ -30,7 +30,7 @@ func main() {
 
 	event := events.Events[0]
 	fmt.Printf("Today is %s! Find more information at: %s.\n", event.Name, event.Url)
-	fmt.Printf("Rate limit remaining: %d/%d (month).\n", events.RateLimit.RemainingMonth, events.RateLimit.LimitMonth)
+	fmt.Printf("Rate limit remaining: %d/%d (billing cycle).\n", events.RateLimit.Remaining, events.RateLimit.Limit)
 
 	// Get Event Information
 	eventInfo, err := client.GetEventInfo(holidays.GetEventInfoRequest{

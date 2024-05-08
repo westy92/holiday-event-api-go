@@ -13,24 +13,30 @@ import (
 
 // The API Client
 type Client struct {
-	apiKey string
+	apiKey      string
+	apiProvider ApiProvider
 }
 
 const (
-	version   = "1.0.0"
+	version   = "1.1.0"
 	userAgent = "HolidayApiGo/" + version
-	baseUrl   = "https://api.apilayer.com/checkiday/"
 )
 
 // Creates a New Client using the provided API key.
+// TODO update docs
 // Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
-func New(apiKey string) (*Client, error) {
+func New(apiProvider ApiProvider, apiKey string) (*Client, error) {
+	if !apiProvider.isValid() {
+		return nil, errors.New("please provide a valid API provider")
+	}
+
 	if apiKey == "" {
-		return nil, errors.New("please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
+		return nil, errors.New("please provide a valid API key. Get one at " + apiProvider.apiKeySource())
 	}
 
 	return &Client{
-		apiKey: apiKey,
+		apiKey:      apiKey,
+		apiProvider: apiProvider,
 	}, nil
 }
 
@@ -112,7 +118,7 @@ func (c *Client) GetVersion() string {
 }
 
 func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
-	url, err := url.Parse(baseUrl)
+	url, err := url.Parse(client.apiProvider.baseUrl())
 	if err != nil {
 		return nil, nil, fmt.Errorf("can't parse baseUrl: %w", err)
 	}
@@ -127,7 +133,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 		return nil, nil, fmt.Errorf("can't create request: %w", err)
 	}
 
-	req.Header.Set("apikey", client.apiKey)
+	client.apiProvider.attachRequestHeaders(&req.Header, client.apiKey)
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("X-Platform-Version", runtime.Version())
 
@@ -150,12 +156,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 		return nil, nil, fmt.Errorf("can't parse response: %w", err)
 	}
 
-	limitMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-limit-month"))
-	remainingMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-remaining-month"))
-	rateLimit := RateLimit{
-		LimitMonth:     limitMonth,
-		RemainingMonth: remainingMonth,
-	}
+	rateLimit := client.apiProvider.extractRateLimitInfo(res.Header)
 
 	return &result, &rateLimit, nil
 }

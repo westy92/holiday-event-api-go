@@ -11,8 +11,8 @@ type StandardResponse struct {
 
 // Your API plan's current Rate Limit and status. Upgrade to increase these limits.
 type RateLimit struct {
-	LimitMonth     int // The amount of requests allowed this month
-	RemainingMonth int // The amount of requests remaining this month
+	Limit     int // The amount of requests allowed this billing cycle
+	Remaining int // The amount of requests remaining this billing cycle
 }
 
 // The Request struct for calling GetEvents
