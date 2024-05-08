@@ -53,12 +53,12 @@ func main() {
 	}
 
 	event := events.Events[0]
-	fmt.Printf("Today is %s! Find more information at: %s.\n", event.Name, event.Url)
-	fmt.Printf("Rate limit remaining: %d/%d (month).\n", events.RateLimit.RemainingMonth, events.RateLimit.LimitMonth)
+	fmt.Printf("Today is %s! Find more information at: %s.\n", event.Name, event.URL)
+	fmt.Printf("Rate limit remaining: %d/%d (billing cycle).\n", events.RateLimit.Remaining, events.RateLimit.Limit)
 
 	// Get Event Information
 	eventInfo, err := client.GetEventInfo(holidays.GetEventInfoRequest{
-		Id: event.Id,
+		ID: event.ID,
 		// These parameters can be specified to calculate the range of eventInfo.Event.Occurrences
 		// Start: 2020,
 		// End: 2030,
