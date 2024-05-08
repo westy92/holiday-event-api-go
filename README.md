@@ -32,7 +32,7 @@ import (
 
 func main() {
 	// Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
-	client, err := holidays.New(holidays.ApiLayer, "<your API key>")
+	client, err := holidays.New(holidays.APILayer, "<your API key>")
 
 	if err != nil {
 		fmt.Println(err)
