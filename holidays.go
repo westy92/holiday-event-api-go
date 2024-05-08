@@ -11,30 +11,40 @@ import (
 	"strconv"
 )
 
-// The API Client
+var ErrAPIProviderRequired = errors.New("please provide a valid API provider")
+var ErrEventIDRequired = errors.New("event id is required")
+var ErrSearchQueryRequired = errors.New("search query is required")
+
+// The API Client.
 type Client struct {
-	apiKey string
+	apiKey      string
+	apiProvider APIProvider
 }
 
 const (
-	version   = "1.0.0"
+	version   = "1.1.0"
 	userAgent = "HolidayApiGo/" + version
-	baseUrl   = "https://api.apilayer.com/checkiday/"
 )
 
 // Creates a New Client using the provided API key.
+// TODO update docs
 // Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
-func New(apiKey string) (*Client, error) {
+func New(apiProvider APIProvider, apiKey string) (*Client, error) {
+	if !apiProvider.isValid() {
+		return nil, ErrAPIProviderRequired
+	}
+
 	if apiKey == "" {
-		return nil, errors.New("please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
+		return nil, errors.New("please provide a valid API key. Get one at " + apiProvider.apiKeySource())
 	}
 
 	return &Client{
-		apiKey: apiKey,
+		apiKey:      apiKey,
+		apiProvider: apiProvider,
 	}, nil
 }
 
-// Gets the Events for the provided Date
+// Gets the Events for the provided Date.
 func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
 	var params = url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
@@ -58,14 +68,15 @@ func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
 	return res, nil
 }
 
-// Gets the Event Info for the provided Event
+// Gets the Event Info for the provided Event.
 func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, error) {
 	var params = url.Values{}
 
-	if req.Id == "" {
-		return nil, errors.New("event id is required")
+	if req.ID == "" {
+		return nil, ErrEventIDRequired
 	}
-	params["id"] = []string{req.Id}
+
+	params["id"] = []string{req.ID}
 
 	if req.Start != 0 {
 		params["start"] = []string{strconv.Itoa(req.Start)}
@@ -85,15 +96,16 @@ func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, e
 	return res, nil
 }
 
-// Searches for Events with the given criteria
+// Searches for Events with the given criteria.
 func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 	var params = url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
 	}
 
 	if req.Query == "" {
-		return nil, errors.New("search query is required")
+		return nil, ErrSearchQueryRequired
 	}
+
 	params["query"] = []string{req.Query}
 
 	res, rateLimit, err := request[SearchResponse](c, "search", params)
@@ -106,28 +118,25 @@ func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 	return res, nil
 }
 
-// Gets the API Client Version
+// Gets the API Client Version.
 func (c *Client) GetVersion() string {
 	return version
 }
 
 func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
-	url, err := url.Parse(baseUrl)
-	if err != nil {
-		return nil, nil, fmt.Errorf("can't parse baseUrl: %w", err)
-	}
+	url := client.apiProvider.baseURL()
 	url.Path = path.Join(url.Path, urlPath)
 
 	if params != nil {
 		url.RawQuery = params.Encode()
 	}
 
-	req, err := http.NewRequest("GET", url.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, url.String(), nil) // TODO pass context lint(noctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("can't create request: %w", err)
 	}
 
-	req.Header.Set("apikey", client.apiKey)
+	client.apiProvider.attachRequestHeaders(&req.Header, client.apiKey)
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("X-Platform-Version", runtime.Version())
 
@@ -137,11 +146,13 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 	}
 
 	defer res.Body.Close()
+
 	if res.StatusCode != http.StatusOK {
 		var errBody errorResponse
 		if err := json.NewDecoder(res.Body).Decode(&errBody); err == nil && errBody.Error != "" {
 			return nil, nil, errors.New(errBody.Error)
 		}
+
 		return nil, nil, errors.New(res.Status)
 	}
 
@@ -150,12 +161,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 		return nil, nil, fmt.Errorf("can't parse response: %w", err)
 	}
 
-	limitMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-limit-month"))
-	remainingMonth, _ := strconv.Atoi(res.Header.Get("x-ratelimit-remaining-month"))
-	rateLimit := RateLimit{
-		LimitMonth:     limitMonth,
-		RemainingMonth: remainingMonth,
-	}
+	rateLimit := client.apiProvider.extractRateLimitInfo(res.Header)
 
 	return &result, &rateLimit, nil
 }
