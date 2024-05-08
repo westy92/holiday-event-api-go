@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var ErrTest = errors.New("err")
+
 func TestNew(t *testing.T) {
 	t.Parallel()
 	t.Run("fails with missing API Key", func(t *testing.T) {
@@ -133,7 +135,7 @@ func TestCommonFunctionality(t *testing.T) {
 		defer gock.Off()
 		gock.New("https://api.apilayer.com/checkiday/").
 			Get("/events").
-			ReplyError(errors.New("err"))
+			ReplyError(ErrTest)
 
 		api, _ := New(APILayer, "abc123")
 		response, err := api.GetEvents(GetEventsRequest{})
