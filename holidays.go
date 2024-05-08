@@ -120,7 +120,6 @@ func (c *Client) GetVersion() string {
 func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
 	url := client.apiProvider.baseUrl()
 	url.Path = path.Join(url.Path, urlPath)
-
 	if params != nil {
 		url.RawQuery = params.Encode()
 	}
