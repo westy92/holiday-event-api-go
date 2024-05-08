@@ -2,6 +2,7 @@ package holidays
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -36,14 +37,21 @@ func (api ApiProvider) apiKeySource() string {
 	}
 }
 
-func (api ApiProvider) baseUrl() string {
+func (api ApiProvider) baseUrl() url.URL {
 	switch api {
 	case ApiLayer:
-		return "https://api.apilayer.com/checkiday/"
+		return url.URL{
+			Scheme: "https",
+			Host:   "api.apilayer.com",
+			Path:   "checkiday",
+		}
 	case RapidApi:
-		return "https://checkiday.p.rapidapi.com/"
+		return url.URL{
+			Scheme: "https",
+			Host:   "checkiday.p.rapidapi.com",
+		}
 	default:
-		return ""
+		return url.URL{}
 	}
 }
 

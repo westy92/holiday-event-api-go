@@ -118,10 +118,7 @@ func (c *Client) GetVersion() string {
 }
 
 func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
-	url, err := url.Parse(client.apiProvider.baseUrl())
-	if err != nil {
-		return nil, nil, fmt.Errorf("can't parse baseUrl: %w", err)
-	}
+	url := client.apiProvider.baseUrl()
 	url.Path = path.Join(url.Path, urlPath)
 
 	if params != nil {
