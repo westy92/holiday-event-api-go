@@ -48,23 +48,19 @@ func (api ApiProvider) baseUrl() string {
 }
 
 func (api ApiProvider) extractRateLimitInfo(headers http.Header) RateLimit {
+	var limit, remaining int
 	switch api {
 	case ApiLayer:
-		limit, _ := strconv.Atoi(headers.Get("x-ratelimit-limit-month"))
-		remaining, _ := strconv.Atoi(headers.Get("x-ratelimit-remaining-month"))
-		return RateLimit{
-			Limit:     limit,
-			Remaining: remaining,
-		}
+		limit, _ = strconv.Atoi(headers.Get("x-ratelimit-limit-month"))
+		remaining, _ = strconv.Atoi(headers.Get("x-ratelimit-remaining-month"))
 	case RapidApi:
-		limit, _ := strconv.Atoi(headers.Get("x-ratelimit-requests-limit"))
-		remaining, _ := strconv.Atoi(headers.Get("x-ratelimit-requests-remaining"))
-		return RateLimit{
-			Limit:     limit,
-			Remaining: remaining,
-		}
+		limit, _ = strconv.Atoi(headers.Get("x-ratelimit-requests-limit"))
+		remaining, _ = strconv.Atoi(headers.Get("x-ratelimit-requests-remaining"))
 	default:
-		return RateLimit{}
+	}
+	return RateLimit{
+		Limit:     limit,
+		Remaining: remaining,
 	}
 }
 
