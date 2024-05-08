@@ -16,7 +16,6 @@ linters:
     - noctx
     - paralleltest
     - testifylint
-    - testpackage
     - tparallel
 linters-settings:
   tagliatelle:
