@@ -113,7 +113,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		require.EqualError(t, err, "500 Internal Server Error")
+		require.EqualError(t, err, "error status returned from API: 500 Internal Server Error")
 
 		assert.True(gock.IsDone())
 	})
@@ -129,7 +129,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		require.EqualError(t, err, "599 ")
+		require.EqualError(t, err, "error status returned from API: 599 ")
 
 		assert.True(gock.IsDone())
 	})
@@ -338,7 +338,7 @@ func TestGetEventInfo(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		require.EqualError(t, err, "Event not found.")
+		require.EqualError(t, err, "error returned from API: Event not found.")
 
 		assert.True(gock.IsDone())
 	})
@@ -427,7 +427,7 @@ func TestSearch(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		require.EqualError(t, err, "Please enter a longer search term.")
+		require.EqualError(t, err, "error returned from API: Please enter a longer search term.")
 
 		assert.True(gock.IsDone())
 	})
@@ -447,7 +447,7 @@ func TestSearch(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		require.EqualError(t, err, "Too many results returned. Please refine your query.")
+		require.EqualError(t, err, "error returned from API: Too many results returned. Please refine your query.")
 
 		assert.True(gock.IsDone())
 	})

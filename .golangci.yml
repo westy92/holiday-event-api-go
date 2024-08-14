@@ -4,7 +4,6 @@ linters:
     - execinquery # Deprecated
     - gomnd # Deprecated
     # TODO re-enable these
-    - err113
     - godox
     - paralleltest
     - tparallel # relies on https://github.com/h2non/gock/issues/117

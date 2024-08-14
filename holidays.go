@@ -13,7 +13,10 @@ import (
 )
 
 var (
+	ErrAPIKeyRequired      = errors.New("please provide a valid API key")
 	ErrAPIProviderRequired = errors.New("please provide a valid API provider")
+	ErrAPIResponse         = errors.New("error returned from API")
+	ErrAPIStatus           = errors.New("error status returned from API")
 	ErrEventIDRequired     = errors.New("event id is required")
 	ErrSearchQueryRequired = errors.New("search query is required")
 )
@@ -38,7 +41,7 @@ func New(apiProvider APIProvider, apiKey string) (*Client, error) {
 	}
 
 	if apiKey == "" {
-		return nil, errors.New("please provide a valid API key. Get one at " + apiProvider.apiKeySource())
+		return nil, fmt.Errorf("%w. Get one at %s", ErrAPIKeyRequired, apiProvider.apiKeySource())
 	}
 
 	return &Client{
@@ -153,10 +156,10 @@ func request[R StandardResponseInterface](ctx context.Context, client *Client, u
 	if res.StatusCode != http.StatusOK {
 		var errBody errorResponse
 		if err := json.NewDecoder(res.Body).Decode(&errBody); err == nil && errBody.Error != "" {
-			return nil, nil, errors.New(errBody.Error)
+			return nil, nil, fmt.Errorf("%w: %s", ErrAPIResponse, errBody.Error)
 		}
 
-		return nil, nil, errors.New(res.Status)
+		return nil, nil, fmt.Errorf("%w: %s", ErrAPIStatus, res.Status)
 	}
 
 	var result R
