@@ -6,11 +6,8 @@ linters:
     - exhaustruct
     # TODO re-enable these
     - err113
-    - funlen
     - godox
-    - nlreturn
     - paralleltest
-    - testifylint
     - tparallel
 linters-settings:
   tagliatelle:
@@ -29,3 +26,4 @@ issues:
     - path: _test\.go
       linters:
         - depguard
+        - funlen

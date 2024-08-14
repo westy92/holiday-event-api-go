@@ -12,6 +12,7 @@ func main() {
 	client, err := holidays.New(holidays.APILayer, "<your API key>")
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
@@ -26,6 +27,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
@@ -42,6 +44,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
@@ -57,6 +60,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	holidays "github.com/westy92/holiday-event-api-go"
 )
 
@@ -22,7 +23,7 @@ func TestNew(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(api)
-		assert.EqualError(err, "please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
+		require.EqualError(t, err, "please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
 	})
 
 	t.Run("returns a new client", func(t *testing.T) {
@@ -31,7 +32,7 @@ func TestNew(t *testing.T) {
 		api, err := holidays.New(holidays.APILayer, "abc123")
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.NotNil(api)
 	})
 }
@@ -96,7 +97,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "MyError!")
+		require.Error(t, err, "MyError!")
 
 		assert.True(gock.IsDone())
 	})
@@ -112,7 +113,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "500 Internal Server Error")
+		require.EqualError(t, err, "500 Internal Server Error")
 
 		assert.True(gock.IsDone())
 	})
@@ -128,7 +129,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "599 ")
+		require.EqualError(t, err, "599 ")
 
 		assert.True(gock.IsDone())
 	})
@@ -144,7 +145,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "can't process request: Get \"https://api.apilayer.com/checkiday/events?adult=false\": err")
+		require.Error(t, err, "can't process request: Get \"https://api.apilayer.com/checkiday/events?adult=false\": err")
 
 		assert.True(gock.IsDone())
 	})
@@ -161,7 +162,7 @@ func TestCommonFunctionality(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "can't parse response: unexpected EOF")
+		require.EqualError(t, err, "can't parse response: unexpected EOF")
 
 		assert.True(gock.IsDone())
 	})
@@ -182,7 +183,7 @@ func TestCommonFunctionality(t *testing.T) {
 		response, err := api.GetEvents(context.TODO(), holidays.GetEventsRequest{})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.Equal("America/Chicago", response.Timezone)
 
 		assert.True(gock.IsDone())
@@ -201,7 +202,7 @@ func TestCommonFunctionality(t *testing.T) {
 		response, err := api.GetEvents(context.TODO(), holidays.GetEventsRequest{})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.Equal(holidays.RateLimit{
 			Limit:     100,
 			Remaining: 88,
@@ -223,7 +224,7 @@ func TestGetEvents(t *testing.T) {
 		response, err := api.GetEvents(context.TODO(), holidays.GetEventsRequest{})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.False(response.Adult)
 		assert.Equal("America/Chicago", response.Timezone)
 		assert.Len(response.Events, 2)
@@ -256,7 +257,7 @@ func TestGetEvents(t *testing.T) {
 		})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.True(response.Adult)
 		assert.Equal("America/New_York", response.Timezone)
 		assert.Len(response.Events, 2)
@@ -287,7 +288,7 @@ func TestGetEventInfo(t *testing.T) {
 		})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.Equal("f90b893ea04939d7456f30c54f68d7b4", response.Event.ID)
 		assert.Len(response.Event.Hashtags, 2)
 
@@ -312,7 +313,7 @@ func TestGetEventInfo(t *testing.T) {
 		})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.Len(response.Event.Occurrences, 2)
 		assert.Equal(holidays.Occurrence{
 			Date:   "08/08/2002",
@@ -337,7 +338,7 @@ func TestGetEventInfo(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "Event not found.")
+		require.EqualError(t, err, "Event not found.")
 
 		assert.True(gock.IsDone())
 	})
@@ -350,7 +351,7 @@ func TestGetEventInfo(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "event id is required")
+		require.EqualError(t, err, "event id is required")
 	})
 }
 
@@ -369,7 +370,7 @@ func TestSearch(t *testing.T) {
 		})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.False(response.Adult)
 		assert.Equal("zucchini", response.Query)
 		assert.Len(response.Events, 3)
@@ -398,7 +399,7 @@ func TestSearch(t *testing.T) {
 		})
 
 		assert := assert.New(t)
-		assert.NoError(err)
+		require.NoError(t, err)
 		assert.True(response.Adult)
 		assert.Equal("porch day", response.Query)
 		assert.Len(response.Events, 1)
@@ -426,7 +427,7 @@ func TestSearch(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "Please enter a longer search term.")
+		require.EqualError(t, err, "Please enter a longer search term.")
 
 		assert.True(gock.IsDone())
 	})
@@ -446,7 +447,7 @@ func TestSearch(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "Too many results returned. Please refine your query.")
+		require.EqualError(t, err, "Too many results returned. Please refine your query.")
 
 		assert.True(gock.IsDone())
 	})
@@ -459,6 +460,6 @@ func TestSearch(t *testing.T) {
 
 		assert := assert.New(t)
 		assert.Nil(response)
-		assert.EqualError(err, "search query is required")
+		require.EqualError(t, err, "search query is required")
 	})
 }
