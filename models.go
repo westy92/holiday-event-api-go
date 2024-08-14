@@ -1,8 +1,7 @@
 package holidays
 
 // An interface of the API's standard response.
-type StandardResponseInterface interface {
-}
+type StandardResponseInterface interface{}
 
 // The API's standard response.
 type StandardResponse struct {

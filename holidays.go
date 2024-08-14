@@ -12,9 +12,11 @@ import (
 	"strconv"
 )
 
-var ErrAPIProviderRequired = errors.New("please provide a valid API provider")
-var ErrEventIDRequired = errors.New("event id is required")
-var ErrSearchQueryRequired = errors.New("search query is required")
+var (
+	ErrAPIProviderRequired = errors.New("please provide a valid API provider")
+	ErrEventIDRequired     = errors.New("event id is required")
+	ErrSearchQueryRequired = errors.New("search query is required")
+)
 
 // The API Client.
 type Client struct {
@@ -47,7 +49,7 @@ func New(apiProvider APIProvider, apiKey string) (*Client, error) {
 
 // Gets the Events for the provided Date.
 func (c *Client) GetEvents(ctx context.Context, req GetEventsRequest) (*GetEventsResponse, error) {
-	var params = url.Values{
+	params := url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
 	}
 
@@ -71,7 +73,7 @@ func (c *Client) GetEvents(ctx context.Context, req GetEventsRequest) (*GetEvent
 
 // Gets the Event Info for the provided Event.
 func (c *Client) GetEventInfo(ctx context.Context, req GetEventInfoRequest) (*GetEventInfoResponse, error) {
-	var params = url.Values{}
+	params := url.Values{}
 
 	if req.ID == "" {
 		return nil, ErrEventIDRequired
@@ -99,7 +101,7 @@ func (c *Client) GetEventInfo(ctx context.Context, req GetEventInfoRequest) (*Ge
 
 // Searches for Events with the given criteria.
 func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResponse, error) {
-	var params = url.Values{
+	params := url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
 	}
 

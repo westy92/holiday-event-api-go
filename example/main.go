@@ -10,7 +10,6 @@ import (
 func main() {
 	// Get a FREE API key from https://apilayer.com/marketplace/checkiday-api#pricing
 	client, err := holidays.New(holidays.APILayer, "<your API key>")
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -25,7 +24,6 @@ func main() {
 		// Timezone: "America/Chicago",
 		// Adult:    false,
 	})
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -42,7 +40,6 @@ func main() {
 		// Start: 2020,
 		// End: 2030,
 	})
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -52,12 +49,12 @@ func main() {
 
 	// Search for Events
 	query := "pizza day"
+
 	search, err := client.Search(ctx, holidays.SearchRequest{
 		Query: query,
 		// These parameters are the defaults but can be specified:
 		// Adult: false,
 	})
-
 	if err != nil {
 		fmt.Println(err)
 		return

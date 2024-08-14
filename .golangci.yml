@@ -8,7 +8,6 @@ linters:
     - err113
     - funlen
     - godox
-    - gofumpt
     - nlreturn
     - paralleltest
     - testifylint
