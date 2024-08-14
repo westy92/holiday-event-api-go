@@ -5,13 +5,10 @@ linters:
     - gomnd # Deprecated
     - exhaustruct
     # TODO re-enable these
-    - depguard
     - err113
-    - forbidigo
     - funlen
     - godox
     - gofumpt
-    - lll
     - nlreturn
     - paralleltest
     - testifylint
@@ -22,3 +19,14 @@ linters-settings:
       use-field-name: true
       rules:
         json: snake
+  lll:
+    line-length: 140
+issues:
+  exclude-rules:
+    - path: example/
+      linters:
+        - depguard
+        - forbidigo
+    - path: _test\.go
+      linters:
+        - depguard
