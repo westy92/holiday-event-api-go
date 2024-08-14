@@ -25,6 +25,7 @@ go get github.com/westy92/holiday-event-api-go
 
 ```go
 import (
+	"context"
 	"fmt"
 
 	holidays "github.com/westy92/holiday-event-api-go"
@@ -39,8 +40,10 @@ func main() {
 		return
 	}
 
+	ctx := context.TODO()
+
 	// Get Events for a given Date
-	events, err := client.GetEvents(holidays.GetEventsRequest{
+	events, err := client.GetEvents(ctx, holidays.GetEventsRequest{
 		// These parameters are the defaults but can be specified:
 		// Date:     "today",
 		// Timezone: "America/Chicago",
@@ -57,7 +60,7 @@ func main() {
 	fmt.Printf("Rate limit remaining: %d/%d (billing cycle).\n", events.RateLimit.Remaining, events.RateLimit.Limit)
 
 	// Get Event Information
-	eventInfo, err := client.GetEventInfo(holidays.GetEventInfoRequest{
+	eventInfo, err := client.GetEventInfo(ctx, holidays.GetEventInfoRequest{
 		ID: event.ID,
 		// These parameters can be specified to calculate the range of eventInfo.Event.Occurrences
 		// Start: 2020,
@@ -73,7 +76,7 @@ func main() {
 
 	// Search for Events
 	query := "pizza day"
-	search, err := client.Search(holidays.SearchRequest{
+	search, err := client.Search(ctx, holidays.SearchRequest{
 		Query: query,
 		// These parameters are the defaults but can be specified:
 		// Adult: false,

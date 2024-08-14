@@ -1,6 +1,7 @@
 package holidays
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -45,7 +46,7 @@ func New(apiProvider APIProvider, apiKey string) (*Client, error) {
 }
 
 // Gets the Events for the provided Date.
-func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
+func (c *Client) GetEvents(ctx context.Context, req GetEventsRequest) (*GetEventsResponse, error) {
 	var params = url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
 	}
@@ -58,7 +59,7 @@ func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
 		params["date"] = []string{req.Date}
 	}
 
-	res, rateLimit, err := request[GetEventsResponse](c, "events", params)
+	res, rateLimit, err := request[GetEventsResponse](c, ctx, "events", params)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +70,7 @@ func (c *Client) GetEvents(req GetEventsRequest) (*GetEventsResponse, error) {
 }
 
 // Gets the Event Info for the provided Event.
-func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, error) {
+func (c *Client) GetEventInfo(ctx context.Context, req GetEventInfoRequest) (*GetEventInfoResponse, error) {
 	var params = url.Values{}
 
 	if req.ID == "" {
@@ -86,7 +87,7 @@ func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, e
 		params["end"] = []string{strconv.Itoa(req.End)}
 	}
 
-	res, rateLimit, err := request[GetEventInfoResponse](c, "event", params)
+	res, rateLimit, err := request[GetEventInfoResponse](c, ctx, "event", params)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +98,7 @@ func (c *Client) GetEventInfo(req GetEventInfoRequest) (*GetEventInfoResponse, e
 }
 
 // Searches for Events with the given criteria.
-func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
+func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResponse, error) {
 	var params = url.Values{
 		"adult": {strconv.FormatBool(req.Adult)},
 	}
@@ -108,7 +109,7 @@ func (c *Client) Search(req SearchRequest) (*SearchResponse, error) {
 
 	params["query"] = []string{req.Query}
 
-	res, rateLimit, err := request[SearchResponse](c, "search", params)
+	res, rateLimit, err := request[SearchResponse](c, ctx, "search", params)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,7 @@ func (c *Client) GetVersion() string {
 	return version
 }
 
-func request[R StandardResponseInterface](client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
+func request[R StandardResponseInterface](client *Client, ctx context.Context, urlPath string, params url.Values) (*R, *RateLimit, error) {
 	url := client.apiProvider.baseURL()
 	url.Path = path.Join(url.Path, urlPath)
 
@@ -131,7 +132,7 @@ func request[R StandardResponseInterface](client *Client, urlPath string, params
 		url.RawQuery = params.Encode()
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url.String(), nil) // TODO pass context lint(noctx)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("can't create request: %w", err)
 	}
