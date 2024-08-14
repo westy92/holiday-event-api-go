@@ -3,12 +3,11 @@ linters:
   disable:
     - execinquery # Deprecated
     - gomnd # Deprecated
-    - exhaustruct
     # TODO re-enable these
     - err113
     - godox
     - paralleltest
-    - tparallel
+    - tparallel # relies on https://github.com/h2non/gock/issues/117
 linters-settings:
   tagliatelle:
     case:
@@ -22,8 +21,10 @@ issues:
     - path: example/
       linters:
         - depguard
+        - exhaustruct
         - forbidigo
     - path: _test\.go
       linters:
         - depguard
+        - exhaustruct
         - funlen

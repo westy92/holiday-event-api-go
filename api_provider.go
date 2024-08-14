@@ -39,6 +39,7 @@ func (api APIProvider) apiKeySource() string {
 }
 
 func (api APIProvider) baseURL() url.URL {
+	//nolint:golint,exhaustruct
 	switch api {
 	case APILayer:
 		return url.URL{
