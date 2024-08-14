@@ -59,7 +59,7 @@ func (c *Client) GetEvents(ctx context.Context, req GetEventsRequest) (*GetEvent
 		params["date"] = []string{req.Date}
 	}
 
-	res, rateLimit, err := request[GetEventsResponse](c, ctx, "events", params)
+	res, rateLimit, err := request[GetEventsResponse](ctx, c, "events", params)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *Client) GetEventInfo(ctx context.Context, req GetEventInfoRequest) (*Ge
 		params["end"] = []string{strconv.Itoa(req.End)}
 	}
 
-	res, rateLimit, err := request[GetEventInfoResponse](c, ctx, "event", params)
+	res, rateLimit, err := request[GetEventInfoResponse](ctx, c, "event", params)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResponse
 
 	params["query"] = []string{req.Query}
 
-	res, rateLimit, err := request[SearchResponse](c, ctx, "search", params)
+	res, rateLimit, err := request[SearchResponse](ctx, c, "search", params)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (c *Client) GetVersion() string {
 	return version
 }
 
-func request[R StandardResponseInterface](client *Client, ctx context.Context, urlPath string, params url.Values) (*R, *RateLimit, error) {
+func request[R StandardResponseInterface](ctx context.Context, client *Client, urlPath string, params url.Values) (*R, *RateLimit, error) {
 	url := client.apiProvider.baseURL()
 	url.Path = path.Join(url.Path, urlPath)
 
