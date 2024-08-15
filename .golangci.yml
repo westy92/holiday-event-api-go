@@ -1,0 +1,29 @@
+linters:
+  enable-all: true
+  disable:
+    - execinquery # Deprecated
+    - gomnd # Deprecated
+    # TODO re-enable these
+    - godox
+linters-settings:
+  lll:
+    line-length: 140
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: snake
+issues:
+  exclude-rules:
+    - path: example/
+      linters:
+        - depguard
+        - exhaustruct
+        - forbidigo
+    - path: _test\.go
+      linters:
+        - depguard
+        - exhaustruct
+        - funlen
+        - paralleltest
+        - tparallel # relies on https://github.com/h2non/gock/issues/117
