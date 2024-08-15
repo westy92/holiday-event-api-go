@@ -26,6 +26,16 @@ func TestNew(t *testing.T) {
 		require.EqualError(t, err, "please provide a valid API key. Get one at https://apilayer.com/marketplace/checkiday-api#pricing")
 	})
 
+	t.Run("fails with invalid provider", func(t *testing.T) {
+		t.Parallel()
+
+		api, err := holidays.New(holidays.APIProvider(-1), "abc123")
+
+		assert := assert.New(t)
+		assert.Nil(api)
+		require.EqualError(t, err, "please provide a valid API provider")
+	})
+
 	t.Run("returns a new client", func(t *testing.T) {
 		t.Parallel()
 
@@ -209,6 +219,17 @@ func TestCommonFunctionality(t *testing.T) {
 		}, response.RateLimit)
 
 		assert.True(gock.IsDone())
+	})
+
+	t.Run("nil context", func(t *testing.T) {
+		api, _ := holidays.New(holidays.APILayer, "abc123")
+		//nolint:golint,staticcheck
+		response, err := api.GetEvents(nil, holidays.GetEventsRequest{})
+
+		assert := assert.New(t)
+		assert.Nil(response)
+		require.Error(t, err)
+		assert.Equal("can't create request: net/http: nil Context", err.Error())
 	})
 }
 

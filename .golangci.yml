@@ -5,16 +5,14 @@ linters:
     - gomnd # Deprecated
     # TODO re-enable these
     - godox
-    - paralleltest
-    - tparallel # relies on https://github.com/h2non/gock/issues/117
 linters-settings:
+  lll:
+    line-length: 140
   tagliatelle:
     case:
       use-field-name: true
       rules:
         json: snake
-  lll:
-    line-length: 140
 issues:
   exclude-rules:
     - path: example/
@@ -27,3 +25,5 @@ issues:
         - depguard
         - exhaustruct
         - funlen
+        - paralleltest
+        - tparallel # relies on https://github.com/h2non/gock/issues/117
